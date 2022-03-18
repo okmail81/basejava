@@ -8,7 +8,7 @@ public class ArrayStorage {
     int storageSize = 0;
 
     void clear() {
-       if (storageSize != 0 ) {
+        if (storageSize != 0) {
             Arrays.fill(storage, 0, storageSize, null);
             storageSize = 0;
         }
@@ -20,8 +20,7 @@ public class ArrayStorage {
     }
 
     Resume get(String uuid) {
-        int sizeArray = size();
-        for (int i = 0; i < sizeArray; i++) {
+        for (int i = 0; i < storageSize; i++) {
             if (storage[i].uuid.equals(uuid)) {
                 return storage[i];
             }
