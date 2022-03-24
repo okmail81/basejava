@@ -8,8 +8,8 @@ import java.util.Arrays;
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
-    int storageSize = 0;
+    private Resume[] storage = new Resume[10000];
+    private int storageSize = 0;
 
     public void clear() {
         if (storageSize != 0) {
@@ -23,41 +23,46 @@ public class ArrayStorage {
             System.out.println("Превышено число сохраненных резюме");
             return;
         }
-        if (getResume(toString(), false) == null) {
+        if (getResumeIndex(toString(), false) == -1) {
             storage[storageSize] = r;
             storageSize++;
         }
     }
 
     public Resume get(String uuid) {
-        return getResume(uuid, true);
+        int resumeIndex = getResumeIndex(uuid, true);
+        if (resumeIndex >= 0) {
+            return storage[resumeIndex];
+        } else {
+            return null;
+        }
     }
 
     public void delete(String uuid) {
-        Resume resume = getResume(uuid, true);
-        if (resume != null) {
-            resume.setUuid(storage[storageSize - 1].getUuid());
+        int resumeIndex = getResumeIndex(uuid, true);
+        if (resumeIndex >= 0) {
+            storage[resumeIndex].setUuid(storage[storageSize - 1].getUuid());
             storage[storageSize - 1] = null;
             storageSize--;
         }
     }
 
     public void update(Resume resume, String uuid) {
-        if (getResume(resume.toString(), true) != null) {
+        if (getResumeIndex(resume.toString(), true) >= 0) {
             resume.setUuid(uuid);
         }
     }
 
-    private Resume getResume(String uuid, boolean showMessage) {
+    private int getResumeIndex(String uuid, boolean showMessage) {
         for (int i = 0; i < storageSize; i++) {
             if (storage[i].getUuid().equals(uuid)) {
-                return storage[i];
+                return i;
             }
         }
         if (showMessage) {
             System.out.println("Резюме " + uuid + " не найдено");
         }
-        return null;
+        return -1;
     }
 
     /**
