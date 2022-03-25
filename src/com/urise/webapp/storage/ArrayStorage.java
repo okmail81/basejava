@@ -53,13 +53,13 @@ public class ArrayStorage {
         }
     }
 
-    private int findIndex(String uuid, boolean message) {
+    private int findIndex(String uuid, boolean isShowMessage) {
         for (int i = 0; i < storageSize; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
             }
         }
-        if (message) {
+        if (isShowMessage) {
             System.out.println("Резюме " + uuid + " не найдено");
         }
         return -1;
