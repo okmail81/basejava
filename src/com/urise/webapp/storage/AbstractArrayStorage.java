@@ -1,5 +1,8 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
+import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -12,23 +15,25 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public void save(Resume r) {
         if (STORAGE_LIMIT == storageSize) {
-            System.out.println("Превышено число сохраненных резюме");
-            return;
+            throw new StorageException("Превышено число сохраненных резюме", r.getUuid());
         }
-        int resumeIndex = findIndex(r.toString(), false);
+        int resumeIndex = findIndex(r.toString());
         if (resumeIndex < 0) {
             saveResume(resumeIndex, r);
             storageSize++;
+        } else {
+            throw new ExistStorageException(r.getUuid());
         }
     }
 
     public void delete(String uuid) {
-        int resumeIndex = findIndex(uuid, true);
-        if (resumeIndex >= 0) {
-            deleteResume(resumeIndex);
-            storage[storageSize - 1] = null;
-            storageSize--;
+        int resumeIndex = findIndex(uuid);
+        if (resumeIndex < 0) {
+            throw new NotExistStorageException(uuid);
         }
+        deleteResume(resumeIndex);
+        storage[storageSize - 1] = null;
+        storageSize--;
     }
 
     public void clear() {
@@ -43,11 +48,11 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public Resume get(String uuid) {
-        int resumeIndex = findIndex(uuid, true);
-        if (resumeIndex >= 0) {
-            return storage[resumeIndex];
+        int resumeIndex = findIndex(uuid);
+        if (resumeIndex < 0) {
+            throw new NotExistStorageException(uuid);
         }
-        return null;
+        return storage[resumeIndex];
     }
 
     public Resume[] getAll() {
@@ -55,15 +60,16 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void update(Resume resume) {
-        int resumeIndex = findIndex(resume.toString(), true);
-        if (resumeIndex >= 0) {
-            storage[resumeIndex] = resume;
+        int resumeIndex = findIndex(resume.toString());
+        if (resumeIndex < 0) {
+            throw new NotExistStorageException(resume.getUuid());
         }
+        storage[resumeIndex] = resume;
     }
 
     protected abstract void saveResume(int resumeIndex, Resume r);
 
     protected abstract void deleteResume(int resumeIndex);
 
-    protected abstract int findIndex(String uuid, boolean b);
+    protected abstract int findIndex(String uuid);
 }

@@ -15,14 +15,11 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int findIndex(String uuid, boolean isShowMessage) {
+    protected int findIndex(String uuid) {
         for (int i = 0; i < storageSize; i++) {
             if (uuid.equals(storage[i].getUuid())) {
                 return i;
             }
-        }
-        if (isShowMessage) {
-            System.out.println("Резюме " + uuid + " не найдено");
         }
         return -1;
     }

@@ -21,13 +21,9 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int findIndex(String uuid, boolean isShowMessage) {
-        Resume searchKey = new Resume();
-        searchKey.setUuid(uuid);
+    protected int findIndex(String uuid) {
+        Resume searchKey = new Resume(uuid);
         int index = Arrays.binarySearch(storage, 0, storageSize, searchKey);
-        if (isShowMessage && index < 0) {
-            System.out.println("Резюме " + uuid + " не найдено");
-        }
-        return index;
+          return index;
     }
 }
