@@ -1,5 +1,6 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.Assertions;
@@ -30,7 +31,9 @@ public abstract class AbstractArrayStorageTest {
     void save() {
         Resume newResume = new Resume(UUID_4);
         storage.save(newResume);
+        Throwable thrown = Assertions.assertThrows(ExistStorageException.class, () -> storage.save(newResume));
         Assertions.assertEquals(newResume, storage.get(UUID_4));
+        Assertions.assertEquals("Резюме " + UUID_4 + " уже существует", thrown.getMessage());
     }
 
     @Test
