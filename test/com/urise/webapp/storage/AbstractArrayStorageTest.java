@@ -40,7 +40,7 @@ public abstract class AbstractArrayStorageTest {
     void delete() {
         storage.delete(UUID_3);
         Throwable thrown = Assertions.assertThrows(NotExistStorageException.class, () -> storage.get(UUID_3));
-        Assertions.assertEquals("Резюме uuid3 не найдено", thrown.getMessage());
+        Assertions.assertEquals("Резюме " + UUID_3 + " не найдено", thrown.getMessage());
     }
 
     @Test
@@ -74,7 +74,8 @@ public abstract class AbstractArrayStorageTest {
 
     @Test()
     public void getNotExist() {
-        Throwable thrown = Assertions.assertThrows(NotExistStorageException.class, () -> storage.get("dummy"));
-        Assertions.assertEquals("Резюме dummy не найдено", thrown.getMessage());
+        String resume = "dummy";
+        Throwable thrown = Assertions.assertThrows(NotExistStorageException.class, () -> storage.get(resume));
+        Assertions.assertEquals("Резюме " + resume + " не найдено", thrown.getMessage());
     }
 }
