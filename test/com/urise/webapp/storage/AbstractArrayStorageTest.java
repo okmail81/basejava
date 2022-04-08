@@ -32,6 +32,7 @@ public abstract class AbstractArrayStorageTest {
     void save() {
         Resume newResume = new Resume(UUID_4);
         storage.save(newResume);
+        storage.get(UUID_4);
         assertEquals(4, storage.size());
     }
 
@@ -40,20 +41,19 @@ public abstract class AbstractArrayStorageTest {
         Resume newResume = new Resume(UUID_4);
         storage.save(newResume);
         Throwable thrown = assertThrows(ExistStorageException.class, () -> storage.save(newResume));
-        assertEquals("Резюме " + UUID_4 + " уже существует", thrown.getMessage());
     }
 
     @Test
     void delete() {
         storage.delete(UUID_3);
         assertEquals(2, storage.size());
+        Throwable thrown = assertThrows(NotExistStorageException.class, () -> storage.get(UUID_3));
     }
 
     @Test
     void deleteNotExist() {
         storage.delete(UUID_3);
         Throwable thrown = assertThrows(NotExistStorageException.class, () -> storage.get(UUID_3));
-        assertEquals("Резюме " + UUID_3 + " не найдено", thrown.getMessage());
     }
 
     @Test
@@ -77,12 +77,14 @@ public abstract class AbstractArrayStorageTest {
     public void getNotExist() {
         String resume = "dummy";
         Throwable thrown = assertThrows(NotExistStorageException.class, () -> storage.get(resume));
-        assertEquals("Резюме " + resume + " не найдено", thrown.getMessage());
     }
 
     @Test
     void getAll() {
-        Resume[] newStorage = storage.getAll();
+        Resume[] newStorage = new Resume[3];
+        newStorage[0] = new Resume(UUID_1);
+        newStorage[1] = new Resume(UUID_2);
+        newStorage[2] = new Resume(UUID_3);
         assertArrayEquals(storage.getAll(), newStorage);
     }
 
@@ -91,5 +93,10 @@ public abstract class AbstractArrayStorageTest {
         Resume r = new Resume(UUID_1);
         storage.update(r);
         assertSame(r, storage.get(UUID_1));
+    }
+
+    @Test
+    void updateNotExist() {
+        Throwable thrown = assertThrows(NotExistStorageException.class, () -> storage.get(UUID_4));
     }
 }
