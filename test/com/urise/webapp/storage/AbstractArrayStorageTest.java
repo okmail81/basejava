@@ -2,6 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,16 @@ public abstract class AbstractArrayStorageTest {
         Resume newResume = new Resume(UUID_4);
         storage.save(newResume);
         assertThrows(ExistStorageException.class, () -> storage.save(newResume));
+    }
+
+    @Test
+    public void saveOverflow() {
+        assertThrows(StorageException.class, () -> {
+            for (int i = 4; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
+                storage.save(new Resume());
+            }
+            storage.save(new Resume());
+        });
     }
 
     @Test
