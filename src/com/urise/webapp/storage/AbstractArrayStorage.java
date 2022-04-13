@@ -1,70 +1,54 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 100000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
 
-    public void save(Resume r) {
-        if (STORAGE_LIMIT == storageSize) {
-            throw new StorageException("Превышено число сохраненных резюме", r.getUuid());
-        }
-        int resumeIndex = findIndex(r.toString());
-        if (resumeIndex < 0) {
-            saveResume(resumeIndex, r);
-            storageSize++;
-        } else {
-            throw new ExistStorageException(r.getUuid());
-        }
+    protected void saveStorage(int resumeIndex, Resume r) {
+        saveResume(resumeIndex, r);
+        storageSize++;
     }
 
-    public void delete(String uuid) {
-        int resumeIndex = findIndex(uuid);
-        if (resumeIndex < 0) {
-            throw new NotExistStorageException(uuid);
-        }
+    protected void deleteStorage(int resumeIndex) {
         deleteResume(resumeIndex);
         storage[storageSize - 1] = null;
         storageSize--;
     }
 
-    public void clear() {
+    protected void clearStorage() {
         if (storageSize != 0) {
             Arrays.fill(storage, 0, storageSize, null);
             storageSize = 0;
         }
     }
 
-    public int size() {
+    protected int storageSize() {
         return storageSize;
     }
 
-    public Resume get(String uuid) {
-        int resumeIndex = findIndex(uuid);
-        if (resumeIndex < 0) {
-            throw new NotExistStorageException(uuid);
-        }
+    protected Resume getStorage(int resumeIndex) {
         return storage[resumeIndex];
     }
 
-    public Resume[] getAll() {
+    protected Resume[] storageGetAll() {
         return Arrays.copyOf(storage, storageSize);
     }
 
-    public void update(Resume resume) {
-        int resumeIndex = findIndex(resume.toString());
-        if (resumeIndex < 0) {
-            throw new NotExistStorageException(resume.getUuid());
-        }
+    protected void storageUpdate(int resumeIndex, Resume resume) {
         storage[resumeIndex] = resume;
+    }
+
+    protected void checkStorageLimit(Resume r) {
+        if (STORAGE_LIMIT == storageSize) {
+            throw new StorageException("Превышено число сохраненных резюме", r.getUuid());
+        }
     }
 
     protected abstract void saveResume(int resumeIndex, Resume r);
