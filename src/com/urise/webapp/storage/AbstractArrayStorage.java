@@ -6,42 +6,43 @@ import com.urise.webapp.model.Resume;
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
-    protected static final int STORAGE_LIMIT = 100000;
+    protected static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
 
-    protected void saveStorage(int resumeIndex, Resume r) {
-        saveResume(resumeIndex, r);
+    protected void saveResume(int resumeIndex, Resume r) {
+        checkStorageLimit(r);
+        saveToArray(resumeIndex, r);
         storageSize++;
     }
 
     protected void deleteStorage(int resumeIndex) {
-        deleteResume(resumeIndex);
+        deleteFromArray(resumeIndex);
         storage[storageSize - 1] = null;
         storageSize--;
     }
 
-    protected void clearStorage() {
+    public void clear() {
         if (storageSize != 0) {
             Arrays.fill(storage, 0, storageSize, null);
             storageSize = 0;
         }
     }
 
-    protected int storageSize() {
+    public int size() {
         return storageSize;
     }
 
-    protected Resume getStorage(int resumeIndex) {
+    protected Resume getResume(int resumeIndex) {
         return storage[resumeIndex];
     }
 
-    protected Resume[] storageGetAll() {
+    public Resume[] getAll() {
         return Arrays.copyOf(storage, storageSize);
     }
 
-    protected void storageUpdate(int resumeIndex, Resume resume) {
+    protected void updateResume(int resumeIndex, Resume resume) {
         storage[resumeIndex] = resume;
     }
 
@@ -51,9 +52,9 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         }
     }
 
-    protected abstract void saveResume(int resumeIndex, Resume r);
+    protected abstract void saveToArray(int resumeIndex, Resume r);
 
-    protected abstract void deleteResume(int resumeIndex);
+    protected abstract void deleteFromArray(int resumeIndex);
 
     protected abstract int findIndex(String uuid);
 }

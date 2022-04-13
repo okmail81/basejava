@@ -6,15 +6,10 @@ import com.urise.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
-    public void clear() {
-        clearStorage();
-    }
-
     public void save(Resume r) {
-        checkStorageLimit(r);
         int resumeIndex = findIndex(r.toString());
         if (resumeIndex < 0) {
-            saveStorage(resumeIndex, r);
+            saveResume(resumeIndex, r);
         } else {
             throw new ExistStorageException(r.getUuid());
         }
@@ -25,7 +20,7 @@ public abstract class AbstractStorage implements Storage {
         if (resumeIndex < 0) {
             throw new NotExistStorageException(uuid);
         }
-        return getStorage(resumeIndex);
+        return getResume(resumeIndex);
     }
 
     public void delete(String uuid) {
@@ -41,32 +36,16 @@ public abstract class AbstractStorage implements Storage {
         if (resumeIndex < 0) {
             throw new NotExistStorageException(resume.getUuid());
         }
-        storageUpdate(resumeIndex, resume);
+        updateResume(resumeIndex, resume);
     }
 
-    public Resume[] getAll() {
-        return storageGetAll();
-    }
+    protected abstract void saveResume(int resumeIndex, Resume r);
 
-    public int size() {
-        return storageSize();
-    }
-
-    protected abstract void clearStorage();
-
-    protected abstract void saveStorage(int resumeIndex, Resume r);
-
-    protected abstract Resume getStorage(int resumeIndex);
+    protected abstract Resume getResume(int resumeIndex);
 
     protected abstract void deleteStorage(int resumeIndex);
 
-    protected abstract void storageUpdate(int resumeIndex, Resume resume);
-
-    protected abstract Resume[] storageGetAll();
-
-    protected abstract int storageSize();
+    protected abstract void updateResume(int resumeIndex, Resume resume);
 
     protected abstract int findIndex(String toString);
-
-    protected abstract void checkStorageLimit(Resume r);
 }

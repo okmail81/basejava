@@ -7,42 +7,39 @@ import java.util.List;
 
 public class ListStorage extends AbstractStorage {
 
-    private final List<Resume> collection = new ArrayList<>();
+    private final List<Resume> storage = new ArrayList<>();
 
-    protected void saveStorage(int resumeIndex, Resume r) {
-        collection.add(r);
+    protected void saveResume(int resumeIndex, Resume r) {
+        storage.add(r);
     }
 
     protected void deleteStorage(int resumeIndex) {
-        collection.remove(resumeIndex);
+        storage.remove(resumeIndex);
     }
 
-    protected void clearStorage() {
-        collection.clear();
+    public void clear() {
+        storage.clear();
     }
 
-    protected int storageSize() {
-        return collection.size();
+    public int size() {
+        return storage.size();
     }
 
-    protected Resume getStorage(int resumeIndex) {
-        return collection.get(resumeIndex);
+    protected Resume getResume(int resumeIndex) {
+        return storage.get(resumeIndex);
     }
 
-    protected Resume[] storageGetAll() {
-        return collection.toArray(new Resume[size()]);
+    public Resume[] getAll() {
+        return storage.toArray(new Resume[size()]);
     }
 
-    protected void storageUpdate(int resumeIndex, Resume resume) {
-        collection.set(resumeIndex, resume);
-    }
-
-    protected void checkStorageLimit(Resume r) {
+    protected void updateResume(int resumeIndex, Resume resume) {
+        storage.set(resumeIndex, resume);
     }
 
     protected int findIndex(String uuid) {
         int i = 0;
-        for (Resume r : collection) {
+        for (Resume r : storage) {
             if (r.getUuid().equals(uuid)) {
                 return i;
             }
