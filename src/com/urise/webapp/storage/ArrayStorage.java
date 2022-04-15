@@ -15,12 +15,12 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int findIndex(String uuid) {
+    protected String findIndex(String uuid) {
         for (int i = 0; i < storageSize; i++) {
             if (uuid.equals(storage[i].getUuid())) {
-                return i;
+                return Integer.toString(i);
             }
         }
-        return -1;
+        return Integer.toString(-1);
     }
 }

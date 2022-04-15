@@ -1,5 +1,7 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
+import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
@@ -11,14 +13,14 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
 
-    protected void saveResume(int resumeIndex, Resume r) {
+    protected void saveResume(String resumeIndex, Resume r) {
         checkStorageLimit(r);
-        saveToArray(resumeIndex, r);
+        saveToArray(Integer.parseInt(resumeIndex), r);
         storageSize++;
     }
 
-    protected void deleteStorage(int resumeIndex) {
-        deleteFromArray(resumeIndex);
+    protected void deleteStorage(String resumeIndex) {
+        deleteFromArray(Integer.parseInt(resumeIndex));
         storage[storageSize - 1] = null;
         storageSize--;
     }
@@ -34,16 +36,16 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return storageSize;
     }
 
-    protected Resume getResume(int resumeIndex) {
-        return storage[resumeIndex];
+    protected Resume getResume(String resumeIndex) {
+        return storage[Integer.parseInt(resumeIndex)];
     }
 
     public Resume[] getAll() {
         return Arrays.copyOf(storage, storageSize);
     }
 
-    protected void updateResume(int resumeIndex, Resume resume) {
-        storage[resumeIndex] = resume;
+    protected void updateResume(String resumeIndex, Resume resume) {
+        storage[Integer.parseInt(resumeIndex)] = resume;
     }
 
     protected void checkStorageLimit(Resume r) {
@@ -52,9 +54,21 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         }
     }
 
+    protected void existStorage(String resumeIndex, Resume r) {
+        if (Integer.parseInt(resumeIndex) > 0) {
+            throw new ExistStorageException(r.getUuid());
+        }
+    }
+
+    protected void nonExistStorage(String resumeIndex, String uuid) {
+        if (Integer.parseInt(resumeIndex) < 0) {
+            throw new NotExistStorageException(uuid);
+        }
+    }
+
     protected abstract void saveToArray(int resumeIndex, Resume r);
 
     protected abstract void deleteFromArray(int resumeIndex);
 
-    protected abstract int findIndex(String uuid);
+    protected abstract String findIndex(String uuid);
 }
