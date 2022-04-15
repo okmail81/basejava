@@ -1,44 +1,56 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
+import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
     public void save(Resume r) {
-        String resumeIndex = findIndex(r.toString());
-        existStorage(resumeIndex, r);
-        saveResume(resumeIndex, r);
+        Object searchKey = findSearchKey(r.getUuid());
+        existStorage(searchKey, r);
+        saveResume(searchKey, r);
     }
 
     public Resume get(String uuid) {
-        String resumeIndex = findIndex(uuid);
-        nonExistStorage(resumeIndex, uuid);
-        return getResume(resumeIndex);
+        Object searchKey = findSearchKey(uuid);
+        nonExistStorage(searchKey, uuid);
+        return getResume(searchKey);
     }
 
     public void delete(String uuid) {
-        String resumeIndex = findIndex(uuid);
-        nonExistStorage(resumeIndex, uuid);
-        deleteStorage(resumeIndex);
+        Object searchKey = findSearchKey(uuid);
+        nonExistStorage(searchKey, uuid);
+        deleteStorage(searchKey);
     }
 
-    public void update(Resume resume) {
-        String resumeIndex = findIndex(resume.toString());
-        nonExistStorage(resumeIndex, resume.getUuid());
-        updateResume(resumeIndex, resume);
+    public void update(Resume r) {
+        Object searchKey = findSearchKey(r.getUuid());
+        nonExistStorage(searchKey, r.getUuid());
+        updateResume(searchKey, r);
     }
 
-    protected abstract void saveResume(String resumeIndex, Resume r);
+    protected void existStorage(Object searchKey, Resume r) {
+        if (isSearchKeyExist(searchKey)) {
+            throw new ExistStorageException(r.getUuid());
+        }
+    }
 
-    protected abstract Resume getResume(String resumeIndex);
+    protected void nonExistStorage(Object searchKey, String uuid) {
+        if (!isSearchKeyExist(searchKey)) {
+            throw new NotExistStorageException(uuid);
+        }
+    }
 
-    protected abstract void deleteStorage(String resumeIndex);
+    protected abstract void saveResume(Object searchKey, Resume r);
 
-    protected abstract void updateResume(String resumeIndex, Resume resume);
+    protected abstract Resume getResume(Object searchKey);
 
-    protected abstract String findIndex(String toString);
+    protected abstract void deleteStorage(Object searchKey);
 
-    protected abstract void existStorage(String resumeIndex, Resume r);
+    protected abstract void updateResume(Object searchKey, Resume resume);
 
-    protected abstract void nonExistStorage(String resumeIndex, String uuid);
+    protected abstract Object findSearchKey(String uuid);
+
+    protected abstract boolean isSearchKeyExist(Object searchKey);
 }

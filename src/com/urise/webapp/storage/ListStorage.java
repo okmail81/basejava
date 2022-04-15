@@ -1,7 +1,5 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.ArrayList;
@@ -11,12 +9,13 @@ public class ListStorage extends AbstractStorage {
 
     private final List<Resume> storage = new ArrayList<>();
 
-    protected void saveResume(String resumeIndex, Resume r) {
+    protected void saveResume(Object searchKey, Resume r) {
         storage.add(r);
     }
 
-    protected void deleteStorage(String resumeIndex) {
-        storage.remove(Integer.parseInt(resumeIndex));
+    protected void deleteStorage(Object searchKey) {
+        int resumeIndex = (Integer) searchKey;
+        storage.remove(resumeIndex);
     }
 
     public void clear() {
@@ -27,38 +26,30 @@ public class ListStorage extends AbstractStorage {
         return storage.size();
     }
 
-    protected Resume getResume(String resumeIndex) {
-        return storage.get(Integer.parseInt(resumeIndex));
+    protected Resume getResume(Object searchKey) {
+        return storage.get((Integer) searchKey);
     }
 
     public Resume[] getAll() {
         return storage.toArray(new Resume[size()]);
     }
 
-    protected void updateResume(String resumeIndex, Resume resume) {
-        storage.set(Integer.parseInt(resumeIndex), resume);
+    protected void updateResume(Object searchKey, Resume resume) {
+        storage.set((Integer) searchKey, resume);
     }
 
-    protected void existStorage(String resumeIndex, Resume r) {
-        if (Integer.parseInt(resumeIndex) > 0) {
-            throw new ExistStorageException(r.getUuid());
-        }
+    protected boolean isSearchKeyExist(Object searchKey) {
+        return (Integer) searchKey >= 0;
     }
 
-    protected void nonExistStorage(String resumeIndex, String uuid) {
-        if (Integer.parseInt(resumeIndex) < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-    }
-
-    protected String findIndex(String uuid) {
+    protected Object findSearchKey(String uuid) {
         int i = 0;
         for (Resume r : storage) {
             if (r.getUuid().equals(uuid)) {
-                return Integer.toString(i);
+                return i;
             }
             i++;
         }
-        return Integer.toString(-1);
+        return -1;
     }
 }

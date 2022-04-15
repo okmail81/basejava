@@ -1,7 +1,5 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
@@ -13,14 +11,14 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
 
-    protected void saveResume(String resumeIndex, Resume r) {
+    protected void saveResume(Object searchKey, Resume r) {
         checkStorageLimit(r);
-        saveToArray(Integer.parseInt(resumeIndex), r);
+        saveToArray(searchKey, r);
         storageSize++;
     }
 
-    protected void deleteStorage(String resumeIndex) {
-        deleteFromArray(Integer.parseInt(resumeIndex));
+    protected void deleteStorage(Object searchKey) {
+        deleteFromArray(searchKey);
         storage[storageSize - 1] = null;
         storageSize--;
     }
@@ -36,16 +34,20 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return storageSize;
     }
 
-    protected Resume getResume(String resumeIndex) {
-        return storage[Integer.parseInt(resumeIndex)];
+    protected Resume getResume(Object searchKey) {
+        return storage[(Integer) searchKey];
     }
 
     public Resume[] getAll() {
         return Arrays.copyOf(storage, storageSize);
     }
 
-    protected void updateResume(String resumeIndex, Resume resume) {
-        storage[Integer.parseInt(resumeIndex)] = resume;
+    protected void updateResume(Object searchKey, Resume resume) {
+        storage[(Integer) searchKey] = resume;
+    }
+
+    protected boolean isSearchKeyExist(Object searchKey) {
+        return (Integer) searchKey >= 0;
     }
 
     protected void checkStorageLimit(Resume r) {
@@ -54,21 +56,9 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         }
     }
 
-    protected void existStorage(String resumeIndex, Resume r) {
-        if (Integer.parseInt(resumeIndex) > 0) {
-            throw new ExistStorageException(r.getUuid());
-        }
-    }
+    protected abstract void saveToArray(Object searchKey, Resume r);
 
-    protected void nonExistStorage(String resumeIndex, String uuid) {
-        if (Integer.parseInt(resumeIndex) < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-    }
+    protected abstract void deleteFromArray(Object searchKey);
 
-    protected abstract void saveToArray(int resumeIndex, Resume r);
-
-    protected abstract void deleteFromArray(int resumeIndex);
-
-    protected abstract String findIndex(String uuid);
+    protected abstract Object findSearchKey(String uuid);
 }
