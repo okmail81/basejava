@@ -6,42 +6,6 @@ import com.urise.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
-    public void save(Resume r) {
-        Object searchKey = findSearchKey(r.getUuid());
-        existStorage(searchKey, r);
-        saveResume(searchKey, r);
-    }
-
-    public Resume get(String uuid) {
-        Object searchKey = findSearchKey(uuid);
-        nonExistStorage(searchKey, uuid);
-        return getResume(searchKey);
-    }
-
-    public void delete(String uuid) {
-        Object searchKey = findSearchKey(uuid);
-        nonExistStorage(searchKey, uuid);
-        deleteStorage(searchKey);
-    }
-
-    public void update(Resume r) {
-        Object searchKey = findSearchKey(r.getUuid());
-        nonExistStorage(searchKey, r.getUuid());
-        updateResume(searchKey, r);
-    }
-
-    protected void existStorage(Object searchKey, Resume r) {
-        if (isSearchKeyExist(searchKey)) {
-            throw new ExistStorageException(r.getUuid());
-        }
-    }
-
-    protected void nonExistStorage(Object searchKey, String uuid) {
-        if (!isSearchKeyExist(searchKey)) {
-            throw new NotExistStorageException(uuid);
-        }
-    }
-
     protected abstract void saveResume(Object searchKey, Resume r);
 
     protected abstract Resume getResume(Object searchKey);
@@ -53,4 +17,40 @@ public abstract class AbstractStorage implements Storage {
     protected abstract Object findSearchKey(String uuid);
 
     protected abstract boolean isSearchKeyExist(Object searchKey);
+
+    public void save(Resume r) {
+        Object searchKey = getExistedSearchKey(r);
+        saveResume(searchKey, r);
+    }
+
+    public Resume get(String uuid) {
+        Object searchKey = getNotExistedSearchKey(uuid);
+        return getResume(searchKey);
+    }
+
+    public void delete(String uuid) {
+        Object searchKey = getNotExistedSearchKey(uuid);
+        deleteStorage(searchKey);
+    }
+
+    public void update(Resume r) {
+        Object searchKey = getNotExistedSearchKey(r.getUuid());
+        updateResume(searchKey, r);
+    }
+
+    private Object getExistedSearchKey(Resume r) {
+        Object searchKey = findSearchKey(r.getUuid());
+        if (isSearchKeyExist(searchKey)) {
+            throw new ExistStorageException(r.getUuid());
+        }
+        return searchKey;
+    }
+
+    private Object getNotExistedSearchKey(String uuid) {
+        Object searchKey = findSearchKey(uuid);
+        if (!isSearchKeyExist(searchKey)) {
+            throw new NotExistStorageException(uuid);
+        }
+        return searchKey;
+    }
 }
