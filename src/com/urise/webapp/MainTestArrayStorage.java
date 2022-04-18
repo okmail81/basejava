@@ -7,10 +7,10 @@ public class MainTestArrayStorage {
     static final SortedArrayStorage ARRAY_STORAGE = new SortedArrayStorage();
 
     public static void main(String[] args) {
-        final Resume r1 = new Resume();
-        final Resume r2 = new Resume();
-        final Resume r3 = new Resume();
-        final Resume r4 = new Resume();
+        final Resume r1 = new Resume("Кандидат1");
+        final Resume r2 = new Resume("Кандидат2");
+        final Resume r3 = new Resume("Кандидат3");
+        final Resume r4 = new Resume("Кандидат4");
 
         ARRAY_STORAGE.save(r1);
         ARRAY_STORAGE.save(r2);
@@ -37,8 +37,8 @@ public class MainTestArrayStorage {
 
     static void printAll() {
         System.out.println("\nGet All");
-        for (Resume r : ARRAY_STORAGE.getAll()) {
-            System.out.println(r);
+        for (Resume r : ARRAY_STORAGE.getAllSorted()) {
+            System.out.println(r + " " + r.getFullName());
         }
     }
 }

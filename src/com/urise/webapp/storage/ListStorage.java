@@ -33,8 +33,9 @@ public class ListStorage extends AbstractStorage {
         return storage.get((Integer) searchKey);
     }
 
-    public Resume[] getAll() {
-        return storage.toArray(new Resume[size()]);
+    @Override
+    protected List<Resume> getList() {
+        return storage;
     }
 
     @Override
