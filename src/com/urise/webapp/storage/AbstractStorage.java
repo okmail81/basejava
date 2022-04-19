@@ -4,12 +4,9 @@ import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractStorage implements Storage {
-
-    private static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getUuid);
 
     protected abstract void saveResume(Object searchKey, Resume r);
 
@@ -26,43 +23,43 @@ public abstract class AbstractStorage implements Storage {
     protected abstract List<Resume> getList();
 
     public void save(Resume r) {
-        Object searchKey = getExistedSearchKey(r);
+        Object searchKey = getNotExistedSearchKey(r);
         saveResume(searchKey, r);
     }
 
     public Resume get(String uuid) {
-        Object searchKey = getNotExistedSearchKey(uuid);
+        Object searchKey = getExistedSearchKey(uuid);
         return getResume(searchKey);
     }
 
     public void delete(String uuid) {
-        Object searchKey = getNotExistedSearchKey(uuid);
+        Object searchKey = getExistedSearchKey(uuid);
         deleteStorage(searchKey);
     }
 
     public void update(Resume r) {
-        Object searchKey = getNotExistedSearchKey(r.getUuid());
+        Object searchKey = getExistedSearchKey(r.getUuid());
         updateResume(searchKey, r);
     }
 
     public List<Resume> getAllSorted() {
         List<Resume> listResume = getList();
-        listResume.sort(RESUME_COMPARATOR);
+        listResume.sort(Resume::compareTo);
         return listResume;
     }
 
-    private Object getExistedSearchKey(Resume r) {
-        Object searchKey = findSearchKey(r.getUuid());
-        if (isSearchKeyExist(searchKey)) {
-            throw new ExistStorageException(r.getUuid());
+    private Object getExistedSearchKey(String uuid) {
+        Object searchKey = findSearchKey(uuid);
+        if (!isSearchKeyExist(searchKey)) {
+            throw new NotExistStorageException(uuid);
         }
         return searchKey;
     }
 
-    private Object getNotExistedSearchKey(String uuid) {
-        Object searchKey = findSearchKey(uuid);
-        if (!isSearchKeyExist(searchKey)) {
-            throw new NotExistStorageException(uuid);
+    private Object getNotExistedSearchKey(Resume r) {
+        Object searchKey = findSearchKey(r.getUuid());
+        if (isSearchKeyExist(searchKey)) {
+            throw new ExistStorageException(r.getUuid());
         }
         return searchKey;
     }

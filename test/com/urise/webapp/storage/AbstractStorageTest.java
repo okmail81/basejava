@@ -6,10 +6,13 @@ import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractStorageTest {
-    private final Storage storage;
+    protected Storage storage;
 
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
@@ -32,14 +35,13 @@ public abstract class AbstractStorageTest {
     void save() {
         Resume newResume = new Resume(UUID_4, UUID_4);
         storage.save(newResume);
-        storage.get(UUID_4);
+        assertEquals(newResume, storage.get(UUID_4));
         assertEquals(4, storage.size());
     }
 
     @Test
     void saveExist() {
-        Resume newResume = new Resume(UUID_4, UUID_4);
-        storage.save(newResume);
+        Resume newResume = new Resume(UUID_3, UUID_3);
         assertThrows(ExistStorageException.class, () -> storage.save(newResume));
     }
 
@@ -52,8 +54,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     void deleteNotExist() {
-        storage.delete(UUID_3);
-        assertThrows(NotExistStorageException.class, () -> storage.get(UUID_3));
+        assertThrows(NotExistStorageException.class, () -> storage.delete(UUID_4));
     }
 
     @Test
@@ -75,17 +76,17 @@ public abstract class AbstractStorageTest {
 
     @Test()
     public void getNotExist() {
-        String resume = "dummy";
-        assertThrows(NotExistStorageException.class, () -> storage.get(resume));
+        String uuid = "dummy";
+        assertThrows(NotExistStorageException.class, () -> storage.get(uuid));
     }
 
     @Test
     void getAllSorted() {
-        Resume[] newStorage = new Resume[3];
-        newStorage[0] = new Resume(UUID_1, UUID_1);
-        newStorage[1] = new Resume(UUID_2, UUID_2);
-        newStorage[2] = new Resume(UUID_3, UUID_3);
-        assertArrayEquals(storage.getAllSorted().toArray(), newStorage);
+        List<Resume> newResumeList = new ArrayList<>();
+        newResumeList.add(new Resume(UUID_1, UUID_1));
+        newResumeList.add(new Resume(UUID_2, UUID_2));
+        newResumeList.add(new Resume(UUID_3, UUID_3));
+        assertEquals(newResumeList, storage.getAllSorted());
     }
 
     @Test

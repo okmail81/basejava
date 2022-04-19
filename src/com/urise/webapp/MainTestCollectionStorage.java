@@ -1,10 +1,10 @@
 package com.urise.webapp;
 
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.storage.MapResumeGetUuidStorage;
+import com.urise.webapp.storage.MapUuidStorage;
 
 public class MainTestCollectionStorage {
-    static final MapResumeGetUuidStorage COLLECTION_STORAGE = new MapResumeGetUuidStorage();
+    static final MapUuidStorage COLLECTION_STORAGE = new MapUuidStorage();
 
     public static void main(String[] args) {
         final Resume r1 = new Resume("Кандидат1");

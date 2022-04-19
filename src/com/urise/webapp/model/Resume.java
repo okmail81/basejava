@@ -12,10 +12,6 @@ public class Resume implements Comparable<Resume> {
 
     private final String fullName;
 
-    public String getFullName() {
-        return fullName;
-    }
-
     public Resume(String fullName) {
         this("", fullName);
     }
@@ -26,6 +22,10 @@ public class Resume implements Comparable<Resume> {
         }
         this.uuid = uuid;
         this.fullName = fullName;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public String getUuid() {
@@ -55,9 +55,6 @@ public class Resume implements Comparable<Resume> {
     @Override
     public int compareTo(Resume o) {
         int compareFullName = fullName.compareTo(o.fullName);
-        if (compareFullName != 0) {
-            return compareFullName;
-        }
-        return uuid.compareTo(o.uuid);
+        return compareFullName != 0 ? compareFullName : uuid.compareTo(o.uuid);
     }
 }

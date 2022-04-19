@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapResumeGetUuidStorage extends AbstractStorage {
+public class MapResumeStorage extends AbstractStorage {
 
     private final Map<String, Resume> storage = new HashMap<>();
 
@@ -31,7 +31,7 @@ public class MapResumeGetUuidStorage extends AbstractStorage {
 
     @Override
     protected Resume getResume(Object resume) {
-        return storage.get(((Resume) resume).getUuid());
+        return (Resume) resume;
     }
 
     @Override
