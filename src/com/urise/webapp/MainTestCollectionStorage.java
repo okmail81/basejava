@@ -36,7 +36,7 @@ public class MainTestCollectionStorage {
     static void printAll() {
         System.out.println("\nGet All");
         for (Resume r : COLLECTION_STORAGE.getAllSorted()) {
-            System.out.println(r + " " + r.getFullName());
+            System.out.println(r);
         }
     }
 }
