@@ -2,16 +2,16 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.model.Resume;
 
-public class ArrayStorage extends AbstractArrayStorage {
+public class ArrayStorage extends AbstractArrayStorage<Integer> {
 
     @Override
-    protected void saveToArray(Object searchKey, Resume r) {
+    protected void saveToArray(Integer searchKey, Resume r) {
         storage[storageSize] = r;
     }
 
     @Override
-    protected void deleteFromArray(Object searchKey) {
-        storage[(Integer) searchKey] = storage[storageSize - 1];
+    protected void deleteFromArray(Integer searchKey) {
+        storage[searchKey] = storage[storageSize - 1];
     }
 
     @Override

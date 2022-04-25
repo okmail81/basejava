@@ -6,20 +6,20 @@ import com.urise.webapp.model.Resume;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage<I extends Number> extends AbstractStorage<Integer> {
     protected static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
 
-    protected abstract void saveToArray(Object searchKey, Resume r);
+    protected abstract void saveToArray(Integer searchKey, Resume r);
 
-    protected abstract void deleteFromArray(Object searchKey);
+    protected abstract void deleteFromArray(Integer searchKey);
 
     protected abstract Integer findSearchKey(String uuid);
 
     @Override
-    protected void saveResume(Object searchKey, Resume r) {
+    protected void saveResume(Integer searchKey, Resume r) {
         checkStorageLimit(r);
         saveToArray(searchKey, r);
         storageSize++;
@@ -32,7 +32,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void deleteStorage(Object searchKey) {
+    protected void deleteStorage(Integer searchKey) {
         deleteFromArray(searchKey);
         storage[storageSize - 1] = null;
         storageSize--;
@@ -50,8 +50,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object searchKey) {
-        return storage[(Integer) searchKey];
+    protected Resume getResume(Integer searchKey) {
+        return storage[searchKey];
     }
 
     @Override
@@ -60,12 +60,12 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void updateResume(Object searchKey, Resume resume) {
-        storage[(Integer) searchKey] = resume;
+    protected void updateResume(Integer searchKey, Resume resume) {
+        storage[searchKey] = resume;
     }
 
     @Override
-    protected boolean isSearchKeyExist(Object searchKey) {
-        return (Integer) searchKey >= 0;
+    protected boolean isSearchKeyExist(Integer searchKey) {
+        return searchKey >= 0;
     }
 }
