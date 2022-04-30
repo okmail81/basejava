@@ -1,6 +1,6 @@
 package com.urise.webapp.model;
 
-public class StringType extends Sections{
+public class StringType extends AbstractSection {
 
     String information;
 
@@ -9,7 +9,7 @@ public class StringType extends Sections{
     }
 
     @Override
-    public void printAll() {
-        System.out.println(information);
+    public String toString() {
+        return information;
     }
 }
