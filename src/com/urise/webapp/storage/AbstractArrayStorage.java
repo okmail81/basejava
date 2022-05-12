@@ -16,10 +16,10 @@ public abstract class AbstractArrayStorage<I extends Number> extends AbstractSto
 
     protected abstract void deleteFromArray(Integer searchKey);
 
-    protected abstract Integer findSearchKey(String uuid);
+    protected abstract Integer getSearchKey(String uuid);
 
     @Override
-    protected void saveResume(Integer searchKey, Resume r) {
+    protected void doSave(Resume r, Integer searchKey) {
         checkStorageLimit(r);
         saveToArray(searchKey, r);
         storageSize++;
@@ -32,7 +32,7 @@ public abstract class AbstractArrayStorage<I extends Number> extends AbstractSto
     }
 
     @Override
-    protected void deleteStorage(Integer searchKey) {
+    protected void doDelete(Integer searchKey) {
         deleteFromArray(searchKey);
         storage[storageSize - 1] = null;
         storageSize--;
@@ -50,22 +50,22 @@ public abstract class AbstractArrayStorage<I extends Number> extends AbstractSto
     }
 
     @Override
-    protected Resume getResume(Integer searchKey) {
+    protected Resume doGet(Integer searchKey) {
         return storage[searchKey];
     }
 
     @Override
-    protected List<Resume> getList() {
+    protected List<Resume> doCopyAll() {
         return Arrays.asList(Arrays.copyOf(storage, size()));
     }
 
     @Override
-    protected void updateResume(Integer searchKey, Resume resume) {
+    protected void doUpdate(Resume resume, Integer searchKey) {
         storage[searchKey] = resume;
     }
 
     @Override
-    protected boolean isSearchKeyExist(Integer searchKey) {
+    protected boolean isExist(Integer searchKey) {
         return searchKey >= 0;
     }
 }

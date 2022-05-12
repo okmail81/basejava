@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.urise.webapp.ResumeTestData.fillResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractStorageTest {
@@ -26,14 +27,14 @@ public abstract class AbstractStorageTest {
     @BeforeEach
     void setUp() {
         storage.clear();
-        storage.save(new Resume(UUID_1, UUID_1));
-        storage.save(new Resume(UUID_2, UUID_2));
-        storage.save(new Resume(UUID_3, UUID_3));
+        storage.save(fillResume(UUID_1, UUID_1));
+        storage.save(fillResume(UUID_2, UUID_2));
+        storage.save(fillResume(UUID_3, UUID_3));
     }
 
     @Test
     void save() {
-        Resume newResume = new Resume(UUID_4, UUID_4);
+        Resume newResume = fillResume(UUID_4, UUID_4);
         storage.save(newResume);
         assertEquals(newResume, storage.get(UUID_4));
         assertEquals(4, storage.size());
@@ -41,7 +42,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     void saveExist() {
-        Resume newResume = new Resume(UUID_3, UUID_3);
+        Resume newResume = fillResume(UUID_3, UUID_3);
         assertThrows(ExistStorageException.class, () -> storage.save(newResume));
     }
 
@@ -71,7 +72,7 @@ public abstract class AbstractStorageTest {
     @Test
     void get() {
         Resume r = storage.get(UUID_1);
-        assertEquals(new Resume(UUID_1, UUID_1), r);
+        assertEquals(fillResume(UUID_1, UUID_1), r);
     }
 
     @Test()
@@ -83,15 +84,15 @@ public abstract class AbstractStorageTest {
     @Test
     void getAllSorted() {
         List<Resume> newResumeList = new ArrayList<>();
-        newResumeList.add(new Resume(UUID_1, UUID_1));
-        newResumeList.add(new Resume(UUID_2, UUID_2));
-        newResumeList.add(new Resume(UUID_3, UUID_3));
+        newResumeList.add(fillResume(UUID_1, UUID_1));
+        newResumeList.add(fillResume(UUID_2, UUID_2));
+        newResumeList.add(fillResume(UUID_3, UUID_3));
         assertEquals(newResumeList, storage.getAllSorted());
     }
 
     @Test
     void update() {
-        Resume r = new Resume(UUID_1, UUID_1);
+        Resume r = fillResume(UUID_1, UUID_1);
         storage.update(r);
         assertSame(r, storage.get(UUID_1));
     }

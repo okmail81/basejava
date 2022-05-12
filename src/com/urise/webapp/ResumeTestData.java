@@ -1,19 +1,41 @@
 package com.urise.webapp;
 
 import com.urise.webapp.model.*;
+import com.urise.webapp.util.DateUtil;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResumeTestData {
     public static void main(String[] args) {
+
+        Resume resume = fillResume("", "Григорий Кислин");
+
+        for (ContactType type : ContactType.values()) {
+            String contact = resume.getContact(type);
+            if (contact != null) {
+                System.out.println(type.getTitle() + ": " + contact);
+            }
+        }
+
+        for (SectionType type : SectionType.values()) {
+            AbstractSection section = resume.getSection(type);
+            if (section != null) {
+                System.out.println("\n" + type.getTitle() + ":");
+                System.out.println(section);
+            }
+        }
+    }
+
+    public static Resume fillResume(String uuid, String fullName) {
         List<String> achievements = new ArrayList<>();
         List<String> qualifications = new ArrayList<>();
         List<Organization> organizations = new ArrayList<>();
         List<Organization> educations = new ArrayList<>();
 
-        Resume resume = new Resume("Григорий Кислин");
+        Resume resume = new Resume(uuid, fullName);
 
         //контакты
         resume.setContactInformation(ContactType.PHONE, "+7(921) 855-0482");
@@ -45,20 +67,22 @@ public class ResumeTestData {
         //Опыт работы
         String company = "Java Online Projects";
         String url = "http://javaops.ru/";
-        LocalDate startDate = LocalDate.of(2013, 10, 1);
-        LocalDate endDate = LocalDate.of(2022, 5, 1);
+        LocalDate startDate = DateUtil.of(2013, Month.of(10));
+        LocalDate endDate = DateUtil.of(2022, Month.of(5));
         String position = "Автор проекта";
         String description = "Создание, организация и проведение Java онлайн проектов и стажировок.";
-        Organization organization = new Organization(company, url, startDate, endDate, position, description);
+        Periods periods = new Periods(startDate, endDate, position, description);
+        Organization organization = new Organization(company, url, periods);
         organizations.add(organization);
 
         company = "Wrike";
         url = "https://www.wrike.com/";
-        startDate = LocalDate.of(2014, 10, 1);
-        endDate = LocalDate.of(2016, 1, 1);
+        startDate = DateUtil.of(2014, Month.of(10));
+        endDate = DateUtil.of(2016, Month.of(1));
         position = "Старший разработчик (backend)";
         description = "Проектирование и разработка онлайн платформы управления проектами Wrike (Java 8 API, Maven, Spring, MyBatis, Guava, Vaadin, PostgreSQL, Redis). Двухфакторная аутентификация, авторизация по OAuth1, OAuth2, JWT SSO.";
-        organization = new Organization(company, url, startDate, endDate, position, description);
+        periods = new Periods(startDate, endDate, position, description);
+        organization = new Organization(company, url, periods);
         organizations.add(organization);
 
         OrganizationSection organizationSection = new OrganizationSection(organizations);
@@ -67,36 +91,25 @@ public class ResumeTestData {
         //Образование
         company = "Coursera";
         url = "https://www.coursera.org/course/progfun";
-        startDate = LocalDate.of(2013, 3, 1);
-        endDate = LocalDate.of(2013, 5, 1);
+        startDate = DateUtil.of(2013, Month.of(3));
+        endDate = DateUtil.of(2013, Month.of(5));
         position = "Functional Programming Principles in Scala' by Martin Odersky";
-        Organization education = new Organization(company, url, startDate, endDate, position);
+        periods = new Periods(startDate, endDate, position);
+        Organization education = new Organization(company, url, periods);
         educations.add(education);
 
         company = "Luxoft";
         url = "http://www.luxoft-training.ru/training/catalog/course.html?ID=22366";
-        startDate = LocalDate.of(2011, 3, 1);
-        endDate = LocalDate.of(2011, 4, 1);
+        startDate = DateUtil.of(2011, Month.of(3));
+        endDate = DateUtil.of(2011, Month.of(4));
         position = "Курс 'Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.'";
-        education = new Organization(company, url, startDate, endDate, position);
+        periods = new Periods(startDate, endDate, position);
+        education = new Organization(company, url, periods);
         educations.add(education);
 
         OrganizationSection educationSection = new OrganizationSection(educations);
         resume.setSection(SectionType.EDUCATION, educationSection);
 
-        for (ContactType type : ContactType.values()) {
-            String contact = resume.getContact(type);
-            if (contact != null) {
-                System.out.println(type.getTitle() + ": " + contact);
-            }
-        }
-
-        for (SectionType type : SectionType.values()) {
-            AbstractSection section = resume.getSection(type);
-            if (section != null) {
-                System.out.println("\n" + type.getTitle() + ":");
-                System.out.println(section);
-            }
-        }
+        return resume;
     }
 }
