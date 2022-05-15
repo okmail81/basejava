@@ -40,10 +40,7 @@ public class MainFile {
             for (File fileName : listFiles) {
                 if (fileName.isFile()) {
                     System.out.println(indent + "-" + fileName.getName());
-                }
-            }
-            for (File fileName : listFiles) {
-                if (fileName.isDirectory()) {
+                } else if (fileName.isDirectory()) {
                     System.out.println(indent + "-" + fileName.getName());
                     printFiles(fileName, indent + "-");
                 }

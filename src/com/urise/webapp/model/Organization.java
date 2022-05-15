@@ -1,10 +1,12 @@
 package com.urise.webapp.model;
 
+import java.util.List;
+
 public class Organization {
     private final Link homePage;
-    private final Periods periods;
+    private final List<Experience> periods;
 
-    public Organization(String name, String url, Periods periods) {
+    public Organization(String name, String url, List<Experience> periods) {
         this.homePage = new Link(name, url);
         this.periods = periods;
     }
@@ -12,7 +14,7 @@ public class Organization {
     @Override
     public String toString() {
         return "\ncompany=" + homePage + '\n' +
-                periods;
+                periods + '\n';
     }
 
     @Override

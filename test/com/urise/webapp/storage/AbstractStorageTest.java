@@ -77,17 +77,16 @@ public abstract class AbstractStorageTest {
 
     @Test()
     public void getNotExist() {
-        String uuid = "dummy";
-        assertThrows(NotExistStorageException.class, () -> storage.get(uuid));
+        assertThrows(NotExistStorageException.class, () -> storage.get("dummy"));
     }
 
     @Test
     void getAllSorted() {
-        List<Resume> newResumeList = new ArrayList<>();
-        newResumeList.add(fillResume(UUID_1, UUID_1));
-        newResumeList.add(fillResume(UUID_2, UUID_2));
-        newResumeList.add(fillResume(UUID_3, UUID_3));
-        assertEquals(newResumeList, storage.getAllSorted());
+        List<Resume> expectedList = new ArrayList<>();
+        expectedList.add(fillResume(UUID_1, UUID_1));
+        expectedList.add(fillResume(UUID_2, UUID_2));
+        expectedList.add(fillResume(UUID_3, UUID_3));
+        assertEquals(expectedList, storage.getAllSorted());
     }
 
     @Test

@@ -3,17 +3,17 @@ package com.urise.webapp.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Periods {
+public class Experience {
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final String title;
     private final String description;
 
-    public Periods(LocalDate startDate, LocalDate endDate, String title) {
+    public Experience(LocalDate startDate, LocalDate endDate, String title) {
         this(startDate, endDate, title, null);
     }
 
-    public Periods(LocalDate startDate, LocalDate endDate, String title, String description) {
+    public Experience(LocalDate startDate, LocalDate endDate, String title, String description) {
         Objects.requireNonNull(startDate, "startDate must not be null");
         Objects.requireNonNull(endDate, "endDate must not be null");
         Objects.requireNonNull(title, "title must not be null");
@@ -26,9 +26,9 @@ public class Periods {
     @Override
     public String toString() {
         return "startDate=" + startDate +
-                " endDate=" + endDate + '\n' +
-                "title=" + title +
-                (description == null ? "" : "\ndescription=" + description);
+                " endDate=" + endDate +
+                " title= " + title +
+                (description == null ? "" : "\ndescription= " + description);
     }
 
     @Override
@@ -36,12 +36,12 @@ public class Periods {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Periods periods = (Periods) o;
+        Experience experience = (Experience) o;
 
-        if (!startDate.equals(periods.startDate)) return false;
-        if (!endDate.equals(periods.endDate)) return false;
-        if (!title.equals(periods.title)) return false;
-        return description != null ? description.equals(periods.description) : periods.description == null;
+        if (!startDate.equals(experience.startDate)) return false;
+        if (!endDate.equals(experience.endDate)) return false;
+        if (!title.equals(experience.title)) return false;
+        return description != null ? description.equals(experience.description) : experience.description == null;
     }
 
     @Override
