@@ -27,6 +27,7 @@ public class Resume implements Comparable<Resume> {
             uuid = UUID.randomUUID().toString();
         }
         Objects.requireNonNull(fullName, "fullName must not be null");
+        Objects.requireNonNull(uuid, "uuid must not be null");
         this.uuid = uuid;
         this.fullName = fullName;
     }
