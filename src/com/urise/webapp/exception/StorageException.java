@@ -1,6 +1,8 @@
 package com.urise.webapp.exception;
 
-public class StorageException extends RuntimeException{
+import java.io.IOException;
+
+public class StorageException extends RuntimeException {
     private final String uuid;
 
     public StorageException(String message, String uuid) {
@@ -11,6 +13,14 @@ public class StorageException extends RuntimeException{
     public StorageException(String message, String uuid, Exception e) {
         super(message, e);
         this.uuid = uuid;
+    }
+
+    public StorageException(String message, IOException e) {
+        this(message, null, e);
+    }
+
+    public StorageException(String message) {
+        this(message, null, null);
     }
 
     public String getUuid() {

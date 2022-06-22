@@ -6,6 +6,7 @@ import com.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import static com.urise.webapp.ResumeTestData.fillResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractStorageTest {
+    protected final static File STORAGE_DIR = new File("D:\\basejava\\storage");
     protected Storage storage;
 
     private static final String UUID_1 = "uuid1";
@@ -93,7 +95,7 @@ public abstract class AbstractStorageTest {
     void update() {
         Resume r = fillResume(UUID_1, UUID_1);
         storage.update(r);
-        assertSame(r, storage.get(UUID_1));
+        assertEquals(r, storage.get(UUID_1));
     }
 
     @Test
