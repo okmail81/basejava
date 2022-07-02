@@ -72,8 +72,7 @@ public class DataStreamSerializer implements StreamSerializer {
     }
 
     private void writeAchievementQualification(ListSection section, DataOutputStream dos) throws IOException {
-        ListSection achievements = section;
-        List<String> achievement = achievements.getItems();
+        List<String> achievement = section.getItems();
         dos.writeInt(achievement.size());
         for (String item : achievement) {
             dos.writeUTF(item);
