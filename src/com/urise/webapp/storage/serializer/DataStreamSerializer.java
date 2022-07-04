@@ -6,6 +6,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,31 +17,27 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
             Map<ContactType, String> contacts = r.getContacts();
-            dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> entry : contacts.entrySet()) {
-                dos.writeUTF(entry.getKey().name());
-                dos.writeUTF(entry.getValue());
-            }
+            writeWithExeption(contacts.entrySet(), dos, new Consumer<Map.Entry<ContactType, String>>() {
+                @Override
+                public void accept(Map.Entry<ContactType, String> entry) throws IOException {
+                    dos.writeUTF(entry.getKey().name());
+                    dos.writeUTF(entry.getValue());
+                }
+            });
             Map<SectionType, Section> sections = r.getSections();
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
                 Section section = entry.getValue();
                 SectionType entryKey = entry.getKey();
                 switch (entryKey) {
                     case PERSONAL:
-                        dos.writeUTF(section.toString());
-                        break;
                     case OBJECTIVE:
                         dos.writeUTF(section.toString());
                         break;
                     case ACHIEVEMENT:
-                        writeAchievementQualification((ListSection) section, dos);
-                        break;
                     case QUALIFICATIONS:
                         writeAchievementQualification((ListSection) section, dos);
                         break;
                     case EXPERIENCE:
-                        writeExperienceOrganization((OrganizationSection) section, dos);
-                        break;
                     case EDUCATION:
                         writeExperienceOrganization((OrganizationSection) section, dos);
                         break;
@@ -71,29 +68,47 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
+    @FunctionalInterface
+    interface Consumer<T> {
+        void accept(T t) throws IOException;
+    }
+
+    private <T> void writeWithExeption(Collection<T> collection, DataOutputStream dos, Consumer<T> action) throws IOException {
+        dos.writeInt(collection.size());
+        for (T t : collection) {
+            action.accept(t);
+        }
+    }
+
     private void writeAchievementQualification(ListSection section, DataOutputStream dos) throws IOException {
         List<String> achievement = section.getItems();
-        dos.writeInt(achievement.size());
-        for (String item : achievement) {
-            dos.writeUTF(item);
-        }
+        writeWithExeption(achievement, dos, new Consumer<>() {
+            @Override
+            public void accept(String item) throws IOException {
+                dos.writeUTF(item);
+            }
+        });
     }
 
     private void writeExperienceOrganization(OrganizationSection section, DataOutputStream dos) throws IOException {
         List<Organization> experienses = section.getOrganizations();
-        dos.writeInt(experienses.size());
-        for (Organization item : experienses) {
-            dos.writeUTF(item.getHomePage().getName());
-            dos.writeUTF(item.getHomePage().getUrl());
-            List<Organization.Position> positions = item.getPositions();
-            dos.writeInt(positions.size());
-            for (Organization.Position position : positions) {
-                writeDate(dos, position.getStartDate());
-                writeDate(dos, position.getEndDate());
-                dos.writeUTF(position.getTitle());
-                dos.writeUTF(position.getDescription());
+        writeWithExeption(experienses, dos, new Consumer<>() {
+            @Override
+            public void accept(Organization item) throws IOException {
+                dos.writeUTF(item.getHomePage().getName());
+                dos.writeUTF(item.getHomePage().getUrl());
+                List<Organization.Position> positions = item.getPositions();
+                writeWithExeption(positions, dos, new Consumer<>() {
+                    @Override
+                    public void accept(Organization.Position position) throws IOException {
+                        writeDate(dos, position.getStartDate());
+                        writeDate(dos, position.getEndDate());
+                        dos.writeUTF(position.getTitle());
+                        dos.writeUTF(position.getDescription());
+                    }
+                });
             }
-        }
+        });
     }
 
     private void writeDate(DataOutputStream dos, LocalDate position) throws IOException {
