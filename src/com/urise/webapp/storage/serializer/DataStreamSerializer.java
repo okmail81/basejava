@@ -17,12 +17,9 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
             Map<ContactType, String> contacts = r.getContacts();
-            writeWithExeption(contacts.entrySet(), dos, new Consumer<Map.Entry<ContactType, String>>() {
-                @Override
-                public void accept(Map.Entry<ContactType, String> entry) throws IOException {
-                    dos.writeUTF(entry.getKey().name());
-                    dos.writeUTF(entry.getValue());
-                }
+            writeWithExeption(contacts.entrySet(), dos, entry -> {
+                dos.writeUTF(entry.getKey().name());
+                dos.writeUTF(entry.getValue());
             });
             Map<SectionType, Section> sections = r.getSections();
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
@@ -35,11 +32,20 @@ public class DataStreamSerializer implements StreamSerializer {
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        writeAchievementQualification((ListSection) section, dos);
+                        writeWithExeption(((ListSection) section).getItems(), dos, dos::writeUTF);
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        writeExperienceOrganization((OrganizationSection) section, dos);
+                        writeWithExeption(((OrganizationSection) section).getOrganizations(), dos, item -> {
+                            dos.writeUTF(item.getHomePage().getName());
+                            dos.writeUTF(item.getHomePage().getUrl());
+                            writeWithExeption(item.getPositions(), dos, position -> {
+                                writeDate(dos, position.getStartDate());
+                                writeDate(dos, position.getEndDate());
+                                dos.writeUTF(position.getTitle());
+                                dos.writeUTF(position.getDescription());
+                            });
+                        });
                         break;
                 }
             }
@@ -78,37 +84,6 @@ public class DataStreamSerializer implements StreamSerializer {
         for (T t : collection) {
             action.accept(t);
         }
-    }
-
-    private void writeAchievementQualification(ListSection section, DataOutputStream dos) throws IOException {
-        List<String> achievement = section.getItems();
-        writeWithExeption(achievement, dos, new Consumer<>() {
-            @Override
-            public void accept(String item) throws IOException {
-                dos.writeUTF(item);
-            }
-        });
-    }
-
-    private void writeExperienceOrganization(OrganizationSection section, DataOutputStream dos) throws IOException {
-        List<Organization> experienses = section.getOrganizations();
-        writeWithExeption(experienses, dos, new Consumer<>() {
-            @Override
-            public void accept(Organization item) throws IOException {
-                dos.writeUTF(item.getHomePage().getName());
-                dos.writeUTF(item.getHomePage().getUrl());
-                List<Organization.Position> positions = item.getPositions();
-                writeWithExeption(positions, dos, new Consumer<>() {
-                    @Override
-                    public void accept(Organization.Position position) throws IOException {
-                        writeDate(dos, position.getStartDate());
-                        writeDate(dos, position.getEndDate());
-                        dos.writeUTF(position.getTitle());
-                        dos.writeUTF(position.getDescription());
-                    }
-                });
-            }
-        });
     }
 
     private void writeDate(DataOutputStream dos, LocalDate position) throws IOException {
