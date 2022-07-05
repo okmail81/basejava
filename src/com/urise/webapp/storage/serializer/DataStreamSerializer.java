@@ -25,6 +25,7 @@ public class DataStreamSerializer implements StreamSerializer {
             writeWithException(sections.entrySet(), dos, entry -> {
                 Section section = entry.getValue();
                 SectionType entryKey = entry.getKey();
+                dos.writeUTF(entryKey.name());
                 switch (entryKey) {
                     case PERSONAL:
                     case OBJECTIVE:
@@ -37,13 +38,24 @@ public class DataStreamSerializer implements StreamSerializer {
                     case EXPERIENCE:
                     case EDUCATION:
                         writeWithException(((OrganizationSection) section).getOrganizations(), dos, item -> {
-                            dos.writeUTF(item.getHomePage().getName());
-                            dos.writeUTF(item.getHomePage().getUrl());
+                            Link homePage = item.getHomePage();
+                            if (homePage == null) {
+                                dos.writeUTF("");
+                                dos.writeUTF("");
+                            } else {
+                                dos.writeUTF(homePage.getName());
+                                dos.writeUTF(homePage.getUrl());
+                            }
                             writeWithException(item.getPositions(), dos, position -> {
                                 writeDate(dos, position.getStartDate());
                                 writeDate(dos, position.getEndDate());
                                 dos.writeUTF(position.getTitle());
-                                dos.writeUTF(position.getDescription());
+                                String description = position.getDescription();
+                                if (description == null) {
+                                    dos.writeUTF("");
+                                } else {
+                                    dos.writeUTF(position.getDescription());
+                                }
                             });
                         });
                         break;
@@ -58,19 +70,33 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
-            int sizeResume = dis.readInt();
-            resume.addSection(SectionType.PERSONAL, new TextSection(dis.readUTF()));
-            resume.addSection(SectionType.OBJECTIVE, new TextSection(dis.readUTF()));
-            readAchivementQualification(dis, resume, SectionType.ACHIEVEMENT);
-            readAchivementQualification(dis, resume, SectionType.QUALIFICATIONS);
-
-            readExperienceOrganization(dis, resume, SectionType.EXPERIENCE);
-
-            readExperienceOrganization(dis, resume, SectionType.EDUCATION);
+            readWithException(dis, () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readWithException(dis, () -> {
+                SectionType sectionType = SectionType.valueOf(dis.readUTF());
+                switch (sectionType) {
+                    case PERSONAL:
+                    case OBJECTIVE:
+                        resume.addSection(sectionType, new TextSection(dis.readUTF()));
+                        break;
+                    case ACHIEVEMENT:
+                    case QUALIFICATIONS:
+                        List<String> achievementList = new ArrayList<>();
+                        readWithException(dis, () -> achievementList.add(dis.readUTF()));
+                        resume.addSection(sectionType, new ListSection(achievementList));
+                        break;
+                    case EXPERIENCE:
+                    case EDUCATION:
+                        List<Organization> organizationList = new ArrayList<>();
+                        readWithException(dis, () -> {
+                            Link homePage = new Link(dis.readUTF(), dis.readUTF());
+                            List<Organization.Position> positionsList = new ArrayList<>();
+                            readWithException(dis, () -> positionsList.add(new Organization.Position(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF())));
+                            organizationList.add(new Organization(homePage, positionsList));
+                        });
+                        resume.addSection(sectionType, new OrganizationSection(organizationList));
+                        break;
+                }
+            });
             return resume;
         }
     }
@@ -87,32 +113,20 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
+    @FunctionalInterface
+    interface Reader {
+        void read() throws IOException;
+    }
+
+    private void readWithException(DataInputStream dis, Reader reader) throws IOException {
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            reader.read();
+        }
+    }
+
     private void writeDate(DataOutputStream dos, LocalDate position) throws IOException {
         dos.writeInt(position.getYear());
         dos.writeInt(position.getMonth().getValue());
-    }
-
-    private void readAchivementQualification(DataInputStream dis, Resume resume, SectionType achievement) throws IOException {
-        int achievementSize = dis.readInt();
-        List<String> achievementList = new ArrayList<>();
-        for (int i = 0; i < achievementSize; i++) {
-            achievementList.add(dis.readUTF());
-        }
-        resume.addSection(achievement, new ListSection(achievementList));
-    }
-
-    private void readExperienceOrganization(DataInputStream dis, Resume resume, SectionType experience) throws IOException {
-        int experienseSize = dis.readInt();
-        List<Organization> organizationList = new ArrayList<>();
-        for (int i = 0; i < experienseSize; i++) {
-            Link homePage = new Link(dis.readUTF(), dis.readUTF());
-            int positionSize = dis.readInt();
-            List<Organization.Position> positionsList = new ArrayList<>();
-            for (int j = 0; j < positionSize; j++) {
-                positionsList.add(new Organization.Position(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF()));
-            }
-            organizationList.add(new Organization(homePage, positionsList));
-        }
-        resume.addSection(experience, new OrganizationSection(organizationList));
     }
 }
