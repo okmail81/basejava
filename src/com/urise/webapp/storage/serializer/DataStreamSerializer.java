@@ -80,19 +80,17 @@ public class DataStreamSerializer implements StreamSerializer {
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        List<String> achievementList = new ArrayList<>();
-                        readWithException(dis, () -> achievementList.add(dis.readUTF()));
+                        List<String> achievementList = readList(list -> readWithException(dis, () -> list.add(dis.readUTF())));
                         resume.addSection(sectionType, new ListSection(achievementList));
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        List<Organization> organizationList = new ArrayList<>();
-                        readWithException(dis, () -> {
+                        List<Organization> organizationList = readList(list -> readWithException(dis, () -> {
                             Link homePage = new Link(dis.readUTF(), dis.readUTF());
-                            List<Organization.Position> positionsList = new ArrayList<>();
-                            readWithException(dis, () -> positionsList.add(new Organization.Position(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF())));
-                            organizationList.add(new Organization(homePage, positionsList));
-                        });
+                            List<Organization.Position> positionsList = readList(positionList -> readWithException(dis, () -> positionList.add(new Organization.Position(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF()))));
+                            list.add(new Organization(homePage, positionsList));
+                        }));
+
                         resume.addSection(sectionType, new OrganizationSection(organizationList));
                         break;
                 }
@@ -124,6 +122,18 @@ public class DataStreamSerializer implements StreamSerializer {
             reader.read();
         }
     }
+
+    @FunctionalInterface
+    interface ListReader<T> {
+        void readList(List<T> list) throws IOException;
+    }
+
+    private <T> List readList(ListReader<T> listReader) throws IOException {
+        List<T> list = new ArrayList<>();
+        listReader.readList(list);
+        return list;
+    }
+
 
     private void writeDate(DataOutputStream dos, LocalDate position) throws IOException {
         dos.writeInt(position.getYear());
