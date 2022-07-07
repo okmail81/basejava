@@ -39,23 +39,15 @@ public class DataStreamSerializer implements StreamSerializer {
                     case EDUCATION:
                         writeWithException(((OrganizationSection) section).getOrganizations(), dos, item -> {
                             Link homePage = item.getHomePage();
-                            if (homePage == null) {
-                                dos.writeUTF("");
-                                dos.writeUTF("");
-                            } else {
-                                dos.writeUTF(homePage.getName());
-                                dos.writeUTF(homePage.getUrl());
-                            }
+                            dos.writeUTF(homePage.getName());
+                            String url = homePage.getUrl();
+                            dos.writeUTF((url == null) ? "" : url);
                             writeWithException(item.getPositions(), dos, position -> {
                                 writeDate(dos, position.getStartDate());
                                 writeDate(dos, position.getEndDate());
                                 dos.writeUTF(position.getTitle());
                                 String description = position.getDescription();
-                                if (description == null) {
-                                    dos.writeUTF("");
-                                } else {
-                                    dos.writeUTF(position.getDescription());
-                                }
+                                dos.writeUTF((description == null) ? "" : description);
                             });
                         });
                         break;
