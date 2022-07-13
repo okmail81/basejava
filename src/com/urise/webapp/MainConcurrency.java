@@ -1,7 +1,5 @@
 package com.urise.webapp;
 
-import com.urise.webapp.model.Resume;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,31 +59,29 @@ public class MainConcurrency {
         });
         System.out.println(mainConcurrency.counter);
 
-        Resume r1 = new Resume("uuid1");
-        Resume r2 = new Resume("uuid2");
+        final String lock1 = "lock1";
+        final String lock2 = "lock2";
+        deadLock(lock1, lock2);
+        deadLock(lock2, lock1);
 
-        startThread(r1, r2);
-        startThread(r2, r1);
     }
 
-    private static void startThread(Resume resume1, Resume resume2) {
+    private static void deadLock(Object lock1, Object lock2) {
         new Thread(() -> {
-            try {
-                readResume(resume1, resume2);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            System.out.println("Waiting " + lock1);
+            synchronized (lock1) {
+                System.out.println("Holding " + lock1);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Waiting " + lock2);
+                synchronized (lock2) {
+                    System.out.println("Holding " + lock2);
+                }
             }
         }).start();
-    }
-
-    private static void readResume(Resume resume1, Resume resume2) throws InterruptedException {
-        synchronized (resume1) {
-            System.out.println(resume1.getFullName());
-            Thread.sleep(1000);
-            synchronized (resume2) {
-                System.out.println(resume2.getFullName());
-            }
-        }
     }
 
     private synchronized void inc() {
