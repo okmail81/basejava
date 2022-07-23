@@ -29,3 +29,4 @@ log
 /lib/jaxb-impl-2.3.2.jar
 /lib/activation-1.1.1.jar
 /lib/gson-2.9.0.jar
+/lib/postgresql-42.2.1.jar
