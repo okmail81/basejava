@@ -19,7 +19,7 @@ public class SqlStorage implements Storage {
 
     @Override
     public void clear() {
-        sqlHelper.process("DELETE FROM resume", PreparedStatement::execute, "", "");
+        sqlHelper.process("DELETE FROM resume", PreparedStatement::execute);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SqlStorage implements Storage {
                 throw new NotExistStorageException(uuid);
             }
             return new Resume(uuid, rs.getString("full_name"));
-        }, "", "");
+        });
     }
 
     @Override
@@ -40,9 +40,11 @@ public class SqlStorage implements Storage {
             ps.setString(1, r.getUuid());
             ps.setString(2, r.getFullName());
             ps.setString(3, r.getUuid());
-            ps.execute();
+            if (ps.executeUpdate() == 0) {
+                throw new NotExistStorageException(r.getUuid());
+            }
             return null;
-        }, "", "");
+        });
     }
 
     @Override
@@ -52,24 +54,23 @@ public class SqlStorage implements Storage {
             ps.setString(2, r.getFullName());
             ps.execute();
             return null;
-        }, "ExistStorageException", r.getUuid());
+        });
     }
 
     @Override
     public void delete(String uuid) {
         sqlHelper.process("DELETE FROM resume r WHERE r.uuid=?", ps -> {
             ps.setString(1, uuid);
-            int result = ps.executeUpdate();
-            if (result == 0) {
+            if (ps.executeUpdate() == 0) {
                 throw new NotExistStorageException(uuid);
             }
             return null;
-        }, "", "");
+        });
     }
 
     @Override
     public List<Resume> getAllSorted() {
-        return sqlHelper.process("SELECT * FROM resume", ps -> {
+        return sqlHelper.process("SELECT * FROM resume ORDER BY full_name", ps -> {
             ps.execute();
             ResultSet rs = ps.executeQuery();
             List<Resume> resumeList = new ArrayList<>();
@@ -77,7 +78,7 @@ public class SqlStorage implements Storage {
                 resumeList.add(new Resume(rs.getString("uuid").trim(), rs.getString("full_name").trim()));
             }
             return resumeList;
-        }, "", "");
+        });
     }
 
     @Override
@@ -89,6 +90,6 @@ public class SqlStorage implements Storage {
                 return rs.getInt("count");
             } else
                 return 0;
-        }, "", "");
+        });
     }
 }
