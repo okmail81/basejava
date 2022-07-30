@@ -30,3 +30,4 @@ log
 /lib/activation-1.1.1.jar
 /lib/gson-2.9.0.jar
 /lib/postgresql-42.2.1.jar
+/apache-tomcat-8.5.81/

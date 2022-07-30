@@ -29,10 +29,10 @@ public class ResumeTestData {
     public static Resume fillResume(String uuid, String fullName) {
         Resume resume = new Resume(uuid, fullName);
 
-//        //контакты
-//        resume.addContact(ContactType.PHONE, "+7(921) 855-0482");
-//        resume.addContact(ContactType.SKYPE, "grigory.kislin");
-//        resume.addContact(ContactType.EMAIL, "gkislin@yandex.ru");
+        //контакты
+        resume.addContact(ContactType.PHONE, "+7(921) 855-0482");
+        resume.addContact(ContactType.SKYPE, "grigory.kislin");
+        resume.addContact(ContactType.EMAIL, "gkislin@yandex.ru");
 //
 //        //Личные качества
 //        resume.addSection(SectionType.PERSONAL,
