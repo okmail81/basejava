@@ -36,11 +36,7 @@ public class SqlStorage implements Storage {
                         throw new NotExistStorageException(uuid);
                     }
                     Resume r = new Resume(uuid, rs.getString("full_name"));
-                    do {
-                        String value = rs.getString("value");
-                        ContactType type = ContactType.valueOf(rs.getString("type"));
-                        r.addContact(type, value);
-                    } while (rs.next());
+                    addContacts(rs, r);
 
                     return r;
                 });
@@ -135,11 +131,19 @@ public class SqlStorage implements Storage {
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact WHERE resume_uuid=?")) {
             ps.setString(1, r.getUuid());
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String value = rs.getString("value");
-                ContactType type = ContactType.valueOf(rs.getString("type"));
-                r.addContact(type, value);
+            if (rs.next()) {
+                addContacts(rs, r);
             }
         }
+    }
+
+    private void addContacts(ResultSet rs, Resume r) throws SQLException {
+        do {
+            String value = rs.getString("value");
+            ContactType type = ContactType.valueOf(rs.getString("type"));
+            if (value != null) {
+                r.addContact(type, value);
+            }
+        } while (rs.next());
     }
 }
