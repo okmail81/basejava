@@ -60,7 +60,7 @@ public class SqlStorage implements Storage {
                             throw new NotExistStorageException(r.getUuid());
                         }
                         deleteContacts(conn, r);
-                        deleteSections(conn, r.getUuid());
+                        deleteSections(conn, r);
                         insertContacts(conn, r);
                         insertSections(conn, r);
                         return null;
@@ -87,7 +87,6 @@ public class SqlStorage implements Storage {
     @Override
     public void delete(String uuid) {
         sqlHelper.transactionalExecute(conn -> {
-            deleteSections(conn, uuid);
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM resume WHERE uuid=?")) {
                 ps.setString(1, uuid);
                 if (ps.executeUpdate() == 0) {
@@ -154,9 +153,9 @@ public class SqlStorage implements Storage {
         }
     }
 
-    private void deleteSections(Connection conn, String uuid) throws SQLException {
+    private void deleteSections(Connection conn, Resume r) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM section WHERE resume_uuid=?")) {
-            ps.setString(1, uuid);
+            ps.setString(1, r.getUuid());
             ps.execute();
         }
     }

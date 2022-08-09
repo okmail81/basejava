@@ -38,7 +38,7 @@ create table section
     resume_uuid char(36) not null
         constraint section_resume_uuid_fk
             references resume
-            on update restrict
+            on update restrict on delete cascade
 );
 
 alter table section
