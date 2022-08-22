@@ -2,6 +2,8 @@ package com.urise.webapp;
 
 import com.urise.webapp.model.*;
 
+import java.time.Month;
+
 public class ResumeTestData {
     public static void main(String[] args) {
 
@@ -51,7 +53,7 @@ public class ResumeTestData {
                         "Version control: Subversion, Git, Mercury, ClearCase, Perforce ",
                         "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle, MySQL, SQLite, MS SQL, HSQLDB"));
 
-/*
+
         //Опыт работы
         resume.addSection(SectionType.EXPERIENCE,
                 new OrganizationSection(
@@ -70,7 +72,7 @@ public class ResumeTestData {
                         new Organization("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "http://www.ifmo.ru/",
                                 new Organization.Position(1993, Month.SEPTEMBER, 1996, Month.JULY, "Аспирантура (программист С, С++)"),
                                 new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)"))));
-*/
+
         return resume;
     }
 }
