@@ -21,8 +21,10 @@
                          type="java.util.Map.Entry<com.urise.webapp.model.ContactType, java.lang.String>"/>
                 <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>
         </c:forEach>
-        <c:forEach var="type" items="<%=SectionType.values()%>">
-            <c:set var="section" value="${resume.getSection(type)}"/>
+        <c:forEach var="sections" items="<%=resume.getSections()%>">
+            <jsp:useBean id="sections" type="java.util.Map.Entry<com.urise.webapp.model.SectionType, com.urise.webapp.model.Section>"/>
+            <c:set var="type" value="${sections.key}"/>
+            <c:set var="section" value="${sections.value}"/>
             <jsp:useBean id="section" type="com.urise.webapp.model.Section"/>
     <h2>${type.title}</h2>
     <c:choose>
@@ -63,7 +65,7 @@
                     </label>
                     по
                     <label>
-                        <%=(position.getEndDate() == DateUtil.NOW) ? "настоящее время":position.getEndDate()%>
+                        <%=(position.getEndDate() == DateUtil.NOW) ? "настоящее время" : position.getEndDate()%>
                         <br>
                     </label>
                     <label>

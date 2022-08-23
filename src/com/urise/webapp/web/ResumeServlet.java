@@ -124,6 +124,8 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             case "view":
+                r = storage.get(uuid);
+                break;
             case "edit":
                 r = storage.get(uuid);
                 for (SectionType type : SectionType.values()) {
@@ -192,7 +194,15 @@ public class ResumeServlet extends HttpServlet {
     private static List<Organization> addBlankOrganization(OrganizationSection experienceSection) {
         List<Organization> organizations = new ArrayList<>();
         if (experienceSection != null) {
-            organizations = experienceSection.getOrganizations();
+            List<Organization> organizationList = experienceSection.getOrganizations();
+            for (Organization organization:organizationList) {
+                List<Organization.Position> position = organization.getPositions();
+                if (position.isEmpty()) {
+                    organizations.add(new Organization(organization.getHomePage().getName(), organization.getHomePage().getUrl(), new Organization.Position(2022, Month.JANUARY, "", "")));
+                } else {
+                    organizations.add(organization);
+                }
+            }
         }
         organizations.add(new Organization("", "",
                 new Organization.Position(2022, Month.JANUARY, "", "")));
