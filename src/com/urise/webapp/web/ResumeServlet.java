@@ -34,6 +34,10 @@ public class ResumeServlet extends HttpServlet {
         }
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
+        if (!isNotEmpty(fullName)) {
+            response.sendRedirect("resume");
+            return;
+        }
         Resume r;
         try {
             r = storage.get(uuid);
@@ -73,26 +77,30 @@ public class ResumeServlet extends HttpServlet {
                         List<Organization> organization = new ArrayList<>();
                         String[] urls = request.getParameterValues(type.name() + "homePageNameUrl");
                         for (int i = 0; i < values.length; i++) {
-                            List<Organization.Position> positions = new ArrayList<>();
-                            String[] parametersStartDate = request.getParameterValues(type.name() + "startDate" + i);
-                            String[] parametersEndDate = request.getParameterValues(type.name() + "endDate" + i);
-                            String[] parametersPositionTitle = request.getParameterValues(type.name() + "positionTitle" + i);
-                            String[] parametersPositionDescription = request.getParameterValues(type.name() + "positionDescription" + i);
-                            for (int j = 0; j < parametersStartDate.length; j++) {
-                                if (isNotEmpty(parametersPositionTitle[j])) {
-                                    String parameterDescription = "";
-                                    if (type == SectionType.EXPERIENCE) {
-                                        parameterDescription = parametersPositionDescription[j];
+                            if (isNotEmpty(values[i])) {
+                                List<Organization.Position> positions = new ArrayList<>();
+                                String[] parametersStartDate = request.getParameterValues(type.name() + "startDate" + i);
+                                String[] parametersEndDate = request.getParameterValues(type.name() + "endDate" + i);
+                                String[] parametersPositionTitle = request.getParameterValues(type.name() + "positionTitle" + i);
+                                String[] parametersPositionDescription = request.getParameterValues(type.name() + "positionDescription" + i);
+                                for (int j = 0; j < parametersStartDate.length; j++) {
+                                    if (isNotEmpty(parametersPositionTitle[j])) {
+                                        String parameterDescription = "";
+                                        if (type == SectionType.EXPERIENCE) {
+                                            parameterDescription = parametersPositionDescription[j];
+                                        }
+                                        LocalDate endDate = (parametersEndDate[j] == "") ? NOW : getLocalDate(parametersEndDate[j]);
+                                        positions.add(new Organization.Position(getLocalDate(parametersStartDate[j]),
+                                                endDate,
+                                                parametersPositionTitle[j], parameterDescription));
                                     }
-                                    LocalDate endDate = (parametersEndDate[j] == "") ? NOW : getLocalDate(parametersEndDate[j]);
-                                    positions.add(new Organization.Position(getLocalDate(parametersStartDate[j]),
-                                            endDate,
-                                            parametersPositionTitle[j], parameterDescription));
                                 }
+                                organization.add(new Organization(new Link(values[i], urls[i]), positions));
                             }
-                            organization.add(new Organization(new Link(values[i], urls[i]), positions));
                         }
-                        r.addSection(type, new OrganizationSection(organization));
+                        if (organization.size() != 0) {
+                            r.addSection(type, new OrganizationSection(organization));
+                        }
                         break;
                 }
             }
@@ -118,13 +126,29 @@ public class ResumeServlet extends HttpServlet {
             case "view":
             case "edit":
                 r = storage.get(uuid);
-                OrganizationSection experienceSection = (OrganizationSection) r.getSection(SectionType.EXPERIENCE);
-                List<Organization> organizations = addBlankOrganization(experienceSection);
-                r.addSection(SectionType.EXPERIENCE, new OrganizationSection(organizations));
-
-                OrganizationSection educationSection = (OrganizationSection) r.getSection(SectionType.EDUCATION);
-                organizations = addBlankOrganization(educationSection);
-                r.addSection(SectionType.EDUCATION, new OrganizationSection(organizations));
+                for (SectionType type : SectionType.values()) {
+                    Section section = r.getSection(type);
+                    switch (type) {
+                        case PERSONAL:
+                        case OBJECTIVE:
+                            if (section == null) {
+                                r.addSection(type, new TextSection(""));
+                            }
+                            break;
+                        case ACHIEVEMENT:
+                        case QUALIFICATIONS:
+                            if (section == null) {
+                                r.addSection(type, new ListSection(""));
+                            }
+                            break;
+                        case EXPERIENCE:
+                        case EDUCATION:
+                            OrganizationSection experienceSection = (OrganizationSection) r.getSection(type);
+                            List<Organization> organizations = addBlankOrganization(experienceSection);
+                            r.addSection(type, new OrganizationSection(organizations));
+                            break;
+                    }
+                }
                 break;
             case "add":
                 r = new Resume("");
@@ -166,7 +190,10 @@ public class ResumeServlet extends HttpServlet {
     }
 
     private static List<Organization> addBlankOrganization(OrganizationSection experienceSection) {
-        List<Organization> organizations = experienceSection.getOrganizations();
+        List<Organization> organizations = new ArrayList<>();
+        if (experienceSection != null) {
+            organizations = experienceSection.getOrganizations();
+        }
         organizations.add(new Organization("", "",
                 new Organization.Position(2022, Month.JANUARY, "", "")));
         return organizations;
