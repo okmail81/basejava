@@ -1,6 +1,9 @@
 <%@ page import="com.urise.webapp.model.OrganizationSection" %>
 <%@ page import="com.urise.webapp.model.SectionType" %>
 <%@ page import="com.urise.webapp.util.DateUtil" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.time.chrono.ChronoLocalDate" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -48,11 +51,9 @@
                         </h3>
                     </label>
                 </dd>
-                <br>
-                Веб сайт:
                 <dd>
                     <label>
-                        <%=organization.getHomePage().getUrl()%>
+                        <h4><a href="${organization.homePage.url}">${organization.homePage.url}</a></h4>
                     </label>
                 </dd>
                 <br>
@@ -65,7 +66,7 @@
                     </label>
                     по
                     <label>
-                        <%=(position.getEndDate() == DateUtil.NOW) ? "настоящее время" : position.getEndDate()%>
+                        <%=(position.getEndDate().isAfter(LocalDate.now())) ? "Сейчас" : position.getEndDate()%>
                         <br>
                     </label>
                     <label>

@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.urise.webapp.util.DateUtil.NOW;
 
@@ -69,7 +73,13 @@ public class ResumeServlet extends HttpServlet {
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
                         if (isNotEmpty(values[0])) {
-                            r.addSection(type, new ListSection(values[0].split("\\n")));
+                            String[] stringList = values[0].split("\\n");
+                            List<String> filteredList = Arrays.stream(stringList)
+                                    .filter(Objects::nonNull)
+                                    .filter(Predicate.not(String::isEmpty))
+                                    .filter(Predicate.not(String::isBlank))
+                                    .collect(Collectors.toList());
+                            r.addSection(type, new ListSection(filteredList));
                         }
                         break;
                     case EXPERIENCE:
@@ -89,7 +99,7 @@ public class ResumeServlet extends HttpServlet {
                                         if (type == SectionType.EXPERIENCE) {
                                             parameterDescription = parametersPositionDescription[j];
                                         }
-                                        LocalDate endDate = (parametersEndDate[j] == "") ? NOW : getLocalDate(parametersEndDate[j]);
+                                        LocalDate endDate = (parametersEndDate[j] == "" || parametersEndDate[j].equals("сейчас")) ? NOW : getLocalDate(parametersEndDate[j]);
                                         positions.add(new Organization.Position(getLocalDate(parametersStartDate[j]),
                                                 endDate,
                                                 parametersPositionTitle[j], parameterDescription));
@@ -195,12 +205,13 @@ public class ResumeServlet extends HttpServlet {
         List<Organization> organizations = new ArrayList<>();
         if (experienceSection != null) {
             List<Organization> organizationList = experienceSection.getOrganizations();
-            for (Organization organization:organizationList) {
+            for (Organization organization : organizationList) {
                 List<Organization.Position> position = organization.getPositions();
                 if (position.isEmpty()) {
                     organizations.add(new Organization(organization.getHomePage().getName(), organization.getHomePage().getUrl(), new Organization.Position(2022, Month.JANUARY, "", "")));
                 } else {
-                    organizations.add(organization);
+                    position.add(new Organization.Position(2022, Month.JANUARY, "", ""));
+                    organizations.add(new Organization(organization.getHomePage(), position));
                 }
             }
         }

@@ -77,8 +77,10 @@
                             </label>
                             по
                             <label>
-                                <input type="date" name="${type.name()}endDate${counter.index}" size=25
-                                       value="${(position.endDate == DateUtil.NOW) ? null:position.endDate}">
+                                <input type="text" name="${type.name()}endDate${counter.index}"
+                                       onfocus="(this.type='date')"
+                                       onblur="if(!this.value)this.type='text'"
+                                       value="${(position.endDate == DateUtil.NOW) ? "сейчас":position.endDate}">
                             </label>
                             <label>
                                 <textarea name='${type.name()}positionTitle${counter.index}' cols=100
