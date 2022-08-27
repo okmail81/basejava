@@ -1,8 +1,4 @@
 <%@ page import="com.urise.webapp.model.OrganizationSection" %>
-<%@ page import="com.urise.webapp.model.SectionType" %>
-<%@ page import="com.urise.webapp.util.DateUtil" %>
-<%@ page import="java.util.Date" %>
-<%@ page import="java.time.chrono.ChronoLocalDate" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -25,7 +21,8 @@
                 <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>
         </c:forEach>
         <c:forEach var="sections" items="<%=resume.getSections()%>">
-            <jsp:useBean id="sections" type="java.util.Map.Entry<com.urise.webapp.model.SectionType, com.urise.webapp.model.Section>"/>
+            <jsp:useBean id="sections"
+                         type="java.util.Map.Entry<com.urise.webapp.model.SectionType, com.urise.webapp.model.Section>"/>
             <c:set var="type" value="${sections.key}"/>
             <c:set var="section" value="${sections.value}"/>
             <jsp:useBean id="section" type="com.urise.webapp.model.Section"/>
@@ -46,15 +43,14 @@
                        varStatus="counter">
                 <jsp:useBean id="organization" type="com.urise.webapp.model.Organization"/>
                 <dd>
-                    <label>
-                        <h3><%=organization.getHomePage().getName()%>
-                        </h3>
-                    </label>
-                </dd>
-                <dd>
-                    <label>
-                        <h4><a href="${organization.homePage.url}">${organization.homePage.url}</a></h4>
-                    </label>
+                    <c:choose>
+                        <c:when test="${empty organization.homePage.url}">
+                            <h3>${organization.homePage.name}</h3>
+                        </c:when>
+                        <c:otherwise>
+                            <h3><a href="${organization.homePage.url}">${organization.homePage.name}</a></h3>
+                        </c:otherwise>
+                    </c:choose>
                 </dd>
                 <br>
                 <c:forEach var="position" items="<%=organization.getPositions()%>">
